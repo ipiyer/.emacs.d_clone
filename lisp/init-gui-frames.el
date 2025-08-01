@@ -3,6 +3,22 @@
 ;;; Code:
 
 
+;; Font configuration
+
+(when (display-graphic-p)
+  ;; Set Fira Code as the default font
+  (set-face-attribute 'default nil
+                      :family "Fira Code"
+                      :height 180
+                      :weight 'normal
+                      :width 'normal)
+  
+  ;; Enable font ligatures for Fira Code
+  (when (require-package 'ligature)
+    (ligature-mode)
+    (global-ligature-mode)))
+
+
 ;; Stop C-z from minimizing windows under OS X
 
 (defun sanityinc/maybe-suspend-frame ()

@@ -91,15 +91,14 @@
 (require 'init-github)
 
 (require 'init-projectile)
+(require 'init-treemacs)
 
 (require 'init-compile)
 (require 'init-crontab)
 (require 'init-textile)
 (require 'init-markdown)
 (require 'init-csv)
-(require 'init-erlang)
 (require 'init-javascript)
-(require 'init-php)
 (require 'init-org)
 (require 'init-nxml)
 (require 'init-html)
@@ -107,13 +106,7 @@
 (require 'init-haml)
 (require 'init-http)
 (require 'init-python)
-(require 'init-haskell)
-(require 'init-elm)
-(require 'init-purescript)
-(require 'init-ruby)
-(require 'init-rails)
 (require 'init-sql)
-(require 'init-ocaml)
 (require 'init-j)
 (require 'init-nim)
 (require 'init-rust)
@@ -168,6 +161,9 @@
   (add-hook 'after-init-hook 'global-eldoc-mode))
 
 (require 'init-direnv)
+
+;; Load test integrations (can be removed after testing)
+(require 'test-integrations nil t)
 
 (when (and (require 'treesit nil t)
            (fboundp 'treesit-available-p)
