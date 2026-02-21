@@ -80,7 +80,13 @@
 (defun prettier-format-on-save ()
   "Format buffer on save using prettier."
   (when buffer-file-name
-    (prettier-format-buffer)))
+    (let ((original-point (point))
+          (original-window-start (window-start)))
+      (shell-command-on-region (point-min) (point-max)
+                               (format "prettier --stdin-filepath %s" buffer-file-name)
+                               (current-buffer) t)
+      (goto-char original-point)
+      (set-window-start (selected-window) original-window-start))))
 
 ;; =============================================================================
 ;; Node Modules Path
@@ -205,7 +211,8 @@
 (add-hook 'typescript-mode-hook
           (lambda ()
             (add-hook 'before-save-hook 'prettier-format-on-save nil t)
-            (add-hook 'before-save-hook 'eslint-check-buffer nil t)))
+            ;(add-hook 'before-save-hook 'eslint-check-buffer nil t)
+            ))
 
 ;; Run and interact with an inferior JS via js-comint.el
 

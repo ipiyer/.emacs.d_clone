@@ -99,6 +99,7 @@
 (require 'init-markdown)
 (require 'init-csv)
 (require 'init-javascript)
+(require 'init-typescript)
 (require 'init-org)
 (require 'init-nxml)
 (require 'init-html)
@@ -196,3 +197,4 @@
 ;; no-byte-compile: t
 ;; End:
 ;;; init.el ends here
+(put 'dired-find-alternate-file 'disabled nil)

@@ -12,11 +12,11 @@
 (add-hook 'after-init-hook 'winner-mode)
 
 
-;; Make "C-x o" prompt for a target window when there are more than 2
-(require-package 'switch-window)
-(setq-default switch-window-shortcut-style 'qwerty)
-(setq-default switch-window-timeout nil)
-(global-set-key (kbd "C-x o") 'switch-window)
+;; Note: Window switching is handled by ace-window in init-treemacs.el
+;; ace-window is configured to:
+;; - Show window labels when there are multiple windows
+;; - Exclude Treemacs windows from selection
+;; - Bind to C-x o for consistency with standard Emacs
 
 
 

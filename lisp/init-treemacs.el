@@ -1,7 +1,7 @@
 ;;; init-treemacs.el --- File tree with Treemacs -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; This file configures Treemacs file tree with all-the-icons support,
+;; This file configures Treemacs file tree with nerd-icons support,
 ;; Projectile integration, and enhanced keybindings.
 
 ;;; Code:
@@ -10,15 +10,18 @@
 ;; Icons for Treemacs
 ;; =============================================================================
 
-(use-package all-the-icons
+(use-package nerd-icons
   :ensure t
-  :if (display-graphic-p)
-  :config
-  ;; Only install fonts if they don't exist
-  (unless (file-exists-p (expand-file-name "Library/Fonts/all-the-icons.ttf" (getenv "HOME")))
-    (all-the-icons-install-fonts t)))
+  :if (display-graphic-p))
 
-;; Fallback icon theme if all-the-icons fails
+;; Treemacs icons for dired
+(use-package treemacs-nerd-icons
+  :ensure t
+  :after (treemacs nerd-icons)
+  :config
+  (treemacs-load-theme "nerd-icons"))
+
+;; Dired integration
 (use-package treemacs-icons-dired
   :ensure t
   :after treemacs
@@ -31,13 +34,12 @@
 
 (use-package treemacs
   :ensure t
-  :defer t
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
-  ;; Use all-the-icons instead of nerd-icons
-  (setq treemacs-icon-theme 'all-the-icons)
+  ;; Use nerd-icons theme
+  (setq treemacs-icon-theme 'nerd-icons)
   ;; Basic settings
   (setq treemacs-collapse-dirs 3)
   (setq treemacs-deferred-git-apply-delay 0.5)
@@ -110,16 +112,36 @@
 ;; Ace Window Integration
 ;; =============================================================================
 
-(use-package ace-window
-  :ensure t
-  :config
+(when (maybe-require-package 'ace-window)
+  ;; Bind ace-window to both C-x o and M-o
   (global-set-key (kbd "M-o") 'ace-window)
-  ;; Exclude treemacs from ace-window
-  (setq aw-ignored-buffers
-        (delq nil
-              (list " *Treemacs-Framebuffer-1*"
-                    " *Treemacs-Scoped-Buffer-Project/.*"
-                    "*Treemacs*"))))
+  (global-set-key (kbd "C-x o") 'ace-window)
+
+  ;; Customize ace-window appearance
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))  ; Use home row keys
+  (setq aw-scope 'frame)  ; Only show windows in current frame
+  (setq aw-background t)  ; Dim background when selecting
+  (setq aw-dispatch-always nil)  ; Only show dispatch menu with 1 window
+  (setq aw-ignore-on t)  ; Enable ignoring buffers
+
+  ;; Exclude Treemacs buffers from ace-window
+  ;; Since aw-ignored-buffers uses exact string matching, we need to list specific buffer names
+  ;; and also advice the aw-ignored-p function to handle pattern matching
+  (with-eval-after-load 'ace-window
+    (setq aw-ignored-buffers
+          (append aw-ignored-buffers
+                  '("*Treemacs*"
+                    " *Treemacs-Framebuffer-1*"
+                    " *Treemacs-Framebuffer-2*"
+                    " *Treemacs-Scoped-Buffer*")))
+
+    ;; Advice to handle any Treemacs buffer name pattern
+    (defun sanityinc/ace-window-ignore-treemacs-advice (orig-fun window)
+      "Advice to ignore all Treemacs windows."
+      (or (funcall orig-fun window)
+          (string-match-p "^[* ]?Treemacs" (buffer-name (window-buffer window)))))
+
+    (advice-add 'aw-ignored-p :around #'sanityinc/ace-window-ignore-treemacs-advice)))
 
 ;; =============================================================================
 ;; Helper Functions
@@ -129,14 +151,13 @@
   "Ensure Treemacs icons are properly loaded."
   (interactive)
   (when (display-graphic-p)
-    (if (require 'all-the-icons nil t)
+    (if (require 'nerd-icons nil t)
         (progn
-          ;; Only install fonts if they don't exist
-          (unless (file-exists-p (expand-file-name "Library/Fonts/all-the-icons.ttf" (getenv "HOME")))
-            (all-the-icons-install-fonts t)
-            (message "All-the-icons fonts installed"))
-          (message "All-the-icons fonts ready"))
-      (message "All-the-icons not available, using fallback icons"))))
+          (message "Nerd-icons loaded successfully")
+          ;; Check if fonts are installed by testing for a common nerd-icons font
+          (unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
+            (message "Nerd-icons fonts may not be installed. Run M-x nerd-icons-install-fonts")))
+      (message "Nerd-icons not available, using fallback icons"))))
 
 (defun test-treemacs-f8-toggle ()
   "Test that F8 properly toggles Treemacs."

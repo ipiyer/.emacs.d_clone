@@ -121,10 +121,10 @@
                         :weight 'normal))))
 
 ;; Configure font for Unicode characters
-(defun setup-unicode-font ()
-  "Set up Unicode font for special characters."
-  (when (find-font (font-spec :name "Symbola"))
-    (set-fontset-font t 'unicode "Symbola" nil 'prepend)))
+;; (defun setup-unicode-font ()
+;;   "Set up Unicode font for special characters."
+;;   (when (find-font (font-spec :name "Symbola"))
+;;     (set-fontset-font t 'unicode "Symbola" nil 'prepend)))
 
 ;; =============================================================================
 ;; Frame and Window Appearance
@@ -193,8 +193,8 @@
 
 (add-hook 'after-init-hook
           (lambda ()
-            (setup-programming-fonts)
-            (setup-unicode-font)
+            ;; Font setup moved to init-gui-frames.el to avoid conflicts
+            ;; (setup-unicode-font)
             (setup-frame-appearance)
             (setup-doom-theme-integrations)))
 

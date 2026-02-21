@@ -5,18 +5,34 @@
 
 ;; Font configuration
 
+(defun sanityinc/set-default-font (frame)
+  "Set the default font for FRAME."
+  (with-selected-frame frame
+    (when (display-graphic-p)
+      ;; Set Fira Code as the default font
+      (set-face-attribute 'default nil
+                          :family "Fira Code"
+                          :height 170
+                          :weight 'normal
+                          :width 'normal)
+
+      ;; Enable font ligatures for Fira Code
+      (when (require-package 'ligature)
+        (ligature-mode)
+        (global-ligature-mode)))))
+
+(add-hook 'after-make-frame-functions 'sanityinc/set-default-font)
+
+;; Also set font for the initial frame
 (when (display-graphic-p)
-  ;; Set Fira Code as the default font
-  (set-face-attribute 'default nil
-                      :family "Fira Code"
-                      :height 180
-                      :weight 'normal
-                      :width 'normal)
-  
-  ;; Enable font ligatures for Fira Code
-  (when (require-package 'ligature)
-    (ligature-mode)
-    (global-ligature-mode)))
+  (sanityinc/set-default-font (selected-frame)))
+
+;; Ensure font is set after init (to override theme font settings)
+(add-hook 'after-init-hook
+          (lambda ()
+            (when (display-graphic-p)
+              (sanityinc/set-default-font (selected-frame)))))
+
 
 
 ;; Stop C-z from minimizing windows under OS X
